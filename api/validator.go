@@ -11,3 +11,10 @@ var validCurrency validator.Func = func(fl validator.FieldLevel) bool {
 	}
 	return false
 }
+
+var validPassword validator.Func = func(fl validator.FieldLevel) bool {
+	if password, ok := fl.Field().Interface().(string); ok {
+		return util.IsStrongPassword(password)
+	}
+	return false
+}
