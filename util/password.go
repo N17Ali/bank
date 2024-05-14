@@ -3,8 +3,18 @@ package util
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	minPasswordLength  = 8
+	requireLowercase   = true
+	requireUppercase   = true
+	requireDigit       = true
+	requireSpecialChar = true
+	specialChars       = "@$!%*?&"
 )
 
 func HashPassword(password string) (string, error) {
@@ -19,34 +29,25 @@ func CheckPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-const (
-	minPasswordLength  = 8
-	requireLowercase   = true
-	requireUppercase   = true
-	requireDigit       = true
-	requireSpecialChar = true
-	specialChars       = "@$!%*?&"
-)
-
 func IsStrongPassword(password string) bool {
-	var (
-		hasLower, hasUpper, hasDigit, hasSpecial bool
-	)
+	var hasLower, hasUpper, hasDigit, hasSpecial bool
 
 	if len(password) < minPasswordLength {
 		return false
 	}
 
-	for _, c := range password {
+	for _, char := range password {
 		switch {
-		case c >= 'a' && c <= 'z':
+		case unicode.IsLower(char):
 			hasLower = true
-		case c >= 'A' && c <= 'Z':
+		case unicode.IsUpper(char):
 			hasUpper = true
-		case c >= '0' && c <= '9':
+		case unicode.IsDigit(char):
 			hasDigit = true
 		default:
-			hasSpecial = strings.ContainsRune(specialChars, c)
+			if strings.ContainsRune(specialChars, char) {
+				hasSpecial = true
+			}
 		}
 
 		if hasLower && hasUpper && hasDigit && hasSpecial {
@@ -54,18 +55,5 @@ func IsStrongPassword(password string) bool {
 		}
 	}
 
-	if requireLowercase && !hasLower {
-		return false
-	}
-	if requireUppercase && !hasUpper {
-		return false
-	}
-	if requireDigit && !hasDigit {
-		return false
-	}
-	if requireSpecialChar && !hasSpecial {
-		return false
-	}
-
-	return true
+	return false
 }

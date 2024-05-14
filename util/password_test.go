@@ -26,3 +26,18 @@ func TestPassword(t *testing.T) {
 	require.EqualError(t, err, bcrypt.ErrMismatchedHashAndPassword.Error())
 
 }
+
+func TestRandomPassword(t *testing.T) {
+	password := RandomPassword()
+
+	// Test that the generated password is at least the minimum length
+	require.GreaterOrEqual(t, len(password), minPasswordLength)
+
+	// Test that the generated password is valid
+	require.True(t, IsStrongPassword(password))
+
+	// Test that the generated password is different each time
+	password1 := RandomPassword()
+	password2 := RandomPassword()
+	require.NotEqual(t, password1, password2)
+}

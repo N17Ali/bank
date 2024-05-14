@@ -6,7 +6,10 @@ import (
 	"time"
 )
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
+const (
+	alphabet      = "abcdefghijklmnopqrstuvwxyz"
+	passwordChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$!%*?&"
+)
 
 func init() {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -26,6 +29,23 @@ func RandomString(n int) string {
 	}
 
 	return sb.String()
+}
+
+func RandomPassword() string {
+	var isValid bool
+	var password string
+	var sb strings.Builder
+	k := len(passwordChars)
+	for !isValid {
+		for i := 0; i < minPasswordLength; i++ {
+			c := passwordChars[rand.Intn(k)]
+			sb.WriteByte(c)
+		}
+		password = sb.String()
+		sb.Reset()
+		isValid = IsStrongPassword(password)
+	}
+	return password
 }
 
 func RandomOwner() string {
